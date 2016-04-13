@@ -131,7 +131,6 @@ include_directories(
 
 ## Declare a C++ executable
 #add_executable(outlet_node src/outlet_node.cpp)
-#add_executable(drive_node src/drive_node.cpp)
 #add_executable(servo_node src/servo_node.cpp)
 
 add_executable(dist_node dist_node.cpp)
@@ -151,9 +150,12 @@ target_link_libraries(dist_node
 #target_link_libraries(servo_node
 #    ${catkin_LIBRARIES}
 #)
-#target_link_libraries(drive_node
-#    ${catkin_LIBRARIES}
-#)
+
+add_executable(drive_node drive_node.cpp)
+target_link_libraries(drive_node
+    ${catkin_LIBRARIES}
+    /usr/local/lib/libwiringPi.so.2.31
+)
 
 
 #find_package(OpenCV REQUIRED)

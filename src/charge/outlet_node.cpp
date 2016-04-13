@@ -1,58 +1,63 @@
-#include "opencv2/objdetect.hpp"
-#include "opencv2/videoio.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/imgproc.hpp"
-
-#include <iostream>
-#include <stdio.h>
-#include "ros/ros.h"
-#include <ros/console.h>
+#include <ros/ros.h>
 #include "std_msgs/String.h"
-#include "std_msgs/Int.h"
+#include "std_msgs/Bool.h"
+#include <ros/console.h>
+#include "opencv2/objdetect.hpp"
+#include "opencv2/imgproc.hpp"
 
 using namespace std;
 using namespace cv;
 
-/** Function Headers */
 void detectOutlets(Mat frame);
 
 /** Global variables */
 String outlet_cascade_path = "20-20-px-375-pos-3170-neg-3-19-16-cascade.xml";
 CascadeClassifier outlet_cascade;
-String window_name = "Capture - OUTLET DETECTION!!!";
-/**
- * @function main
- */
-int main(int argc, char **argv)
+
+
+int main (int argc, char **argv)
 {
+    ros::init(argc, argv, "outlet_node");
+    ros::NodeHandle outlet_node;
+
+    std_msgs::Bool OUTLET_DETECTED;
+    ros::Publisher outlet_pub = outlet_node.advertise<std_msgs::Bool>("outlet", 100);
+
     VideoCapture capture;
     Mat frame;
 
-    //-- 1. Load the cascade
     if(!outlet_cascade.load(outlet_cascade_name) ){ printf("--(!)ERROR loading cascade\n"); return -1; };
 
-    
-    //-- 2. Read the video stream
     capture.open(-1) ;
-    if (!capture.isOpened()) {printf("--(!)Error opening video capture\n"); return -1; }
-
-    while (capture.read(frame) )
+    if (!capture.isOpened())
     {
-        if(frame.empty() )
+        printf("--(!)Error opening video capture\n"); return -1;
+    }
+    
+    ros::Rate r(1);
+
+    while (ros::ok() && capture.read(frame))
+    {
+        if (frame.empty())
         {
-            printf(" --(!) No captured frame -- Break!");
-            break;
+            printf("outlet frame empty PROBLEM\n");
+            // TODO ROS DEBUG
+        }
+        OUTLET_DETECTED = detectOutlets(frame);
+        if (OUTLET_DETECTED)
+        {
+            printf("outlet detected?: %s\n", OUTLET_DETECTED);
+            OUTLET_DETECTED.data = true;
+            outlet_pub.publish(OUTLET_DETECTED;
+            ros::spinOnce();
         }
 
-        //-- 3. Apply the classifier to the frame
-        detectOutlets(frame);
+        r.sleep();              
     }
+
     return 0;
 }
 
-/**
- * @function detectOutlets
- */
 void detectOutlets(Mat frame)
 {
     std::vector<Rect> outlets;
@@ -63,14 +68,17 @@ void detectOutlets(Mat frame)
 
     //  Detect outlets
     outlet_cascade.detectMultiScale(frame_gray, outlets, 1.1, 2, 0, Size(20, 20));
+
+    //if (outlets.size() > 0)
+    //{
+    return outlets.size();
+    //}
     
-    if (outlets.size() > 0) {
-        
-    }
-    for(size_t i = 0; i < outlets.size(); i++) {
-        Mat outletROI = frame_gray( faces[i] );
-        Point center( [i].x + faces[i].width/2, faces[i].y + faces[i].height/2 );
-        ellipse( frame, center, Size( faces[i].width/2, faces[i].height/2 ), 0, 0, 360, Scalar( 255, 0, 0 ), 2, 8, 0 );
-    }
+    for(size_t i = 0; i < outlets.size(); i++)
+    {
+        Mat outletROI = frame_gray(outlets[i]);
+        Point center([i].x + outlets[i].width/2, outlets[i].y +outlets[i].height/2);
+        ellipse(frame, center, Size(outlets[i].width/2, outlets[i].height/2 ), 0, 0, 360, Scalar( 255,0,0),2,8,0);
 
 }
+
