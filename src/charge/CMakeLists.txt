@@ -135,8 +135,26 @@ include_directories(
 #add_executable(servo_node src/servo_node.cpp)
 
 add_executable(dist_node dist_node.cpp)
-add_library(lidarLite include/src/lidarLite.cpp)
-target_link_libraries(dist_node lidarLite)
+add_library(lidarLite include/lidarLite/src/lidarLite.cpp)
+target_link_libraries(dist_node 
+    lidarLite  
+    /usr/local/lib/libwiringPi.so.2.31
+    /usr/local/lib/libwiringPiPca9685.so
+)
+
+target_link_libraries(dist_node 
+    ${catkin_LIBRARIES}
+)
+#target_link_libraries(outlet_node
+#    ${catkin_LIBRARIES}
+#)
+#target_link_libraries(servo_node
+#    ${catkin_LIBRARIES}
+#)
+#target_link_libraries(drive_node
+#    ${catkin_LIBRARIES}
+#)
+
 
 #find_package(OpenCV REQUIRED)
 #target_link_libaries(your_node ${OpenCV_LIBS})
