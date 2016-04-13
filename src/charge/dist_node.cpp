@@ -1,10 +1,9 @@
 
-
-#include "ros/ros.h"
+#include <ros/ros.h>
 #include "std_msgs/String.h"
 #include "std_msgs/Int8.h"
 #include <ros/console.h>
-#include <lidarLite.h>
+#include "include/lidarLite.h"
 
 int main (int argc, char **argv) {
 
