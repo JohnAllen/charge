@@ -1,24 +1,26 @@
 #include <ros/ros.h>
+#include <ros/package.h>
+#include <ros/console.h>
 #include "std_msgs/String.h"
 #include "std_msgs/Int8.h"
 #include "std_msgs/Bool.h"
-#include <ros/console.h>
+#include "std_msgs/MultiArrayLayout.h"
+#include "std_msgs/MultiArrayDimension.h"
+#include "std_msgs/Int32MultiArray.h"
+
 #include <opencv2/objdetect.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv2/objdetect/objdetect.hpp"
-#include "std_msgs/MultiArrayLayout.h"
-#include "std_msgs/MultiArrayDimension.h"
-#include "std_msgs/Int32MultiArray.h"
 #include <image_transport/image_transport.h>
 #include <iostream>
 
 using namespace std;
 using namespace cv;
 
-/** Global variables */
+/* Globals */
 String outlet_cascade_path = "20-20-px-375-pos-3170-neg-3-19-16-cascade.xml";
 CascadeClassifier outlet_cascade;
 
@@ -35,6 +37,7 @@ int detectOutlets(Mat frame)
 
     //if (outlets.size() > 0)
     //{
+    cout << "outlets.size() is " << outlets.size() << "\n";
     return outlets.size();
     //}
 
@@ -60,6 +63,8 @@ int main (int argc, char **argv)
     VideoCapture capture;
     Mat frame;
 
+    outlet_cascade_path = ros::package::getPath("charge") + "/" + outlet_cascade_path;
+    cout << "charge's package path is " << outlet_cascade_path << "\n";
     if (!outlet_cascade.load(outlet_cascade_path))
     {
         printf("--(!) Couldn't load the outlet cascade file\n"); return -1; 
