@@ -26,9 +26,9 @@ using namespace std;
 *   
 *   Need all vars available in main function scope:
 */
-void distCallback(const std_msgs::Int8 dist_msg)
+void distCallback(std_msgs::Int8 dist_msg)
 {
-    ROS_INFO("I heard: [%s]", dist_msg);
+    ROS_INFO("I heard: [%d]", dist_msg.data);
 }
 
 void outletCallback(const std_msgs::Int8 outlet_msg)
@@ -54,10 +54,12 @@ int main (int argc, char **argv)
     }   
     ros::init(argc, argv, "drive_node");
     ros::NodeHandle drive_node;
-    ros::Subscriber dist_sub = drive_node.subscribe("distance", 100,
+    cout << "Made it here\n";
+    ros::Subscriber dist_sub = drive_node.subscribe("dist", 100,
 distCallback); // Distance is automatically the distance to outlet
     ros::Subscriber outlet_sub = drive_node.subscribe("outlets", 100, outletCallback);
     ros::Subscriber panangle_sub = drive_node.subscribe("pan_angle", 100, panangleCallback);
+    cout << "Made it here\n";
    
     int front_dist = 100; 
     int back_dist = 100;
