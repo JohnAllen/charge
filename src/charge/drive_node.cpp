@@ -52,7 +52,6 @@ int main (int argc, char **argv)
     {
         printf("wiringPi setup.  Motors ready\n");
     }   
-
     ros::init(argc, argv, "drive_node");
     ros::NodeHandle drive_node;
     ros::Subscriber dist_sub = drive_node.subscribe("distance", 100,
@@ -62,10 +61,9 @@ distCallback); // Distance is automatically the distance to outlet
    
     int front_dist = 100; 
     int back_dist = 100;
-    while (1==1)
+    while (ros::ok())
     {
-
-        search(front_dist, back_dist);
+//        search(front_dist, back_dist);
         /*if (!OUTLETS) {
         } else if (OUTLETS && DIST > MAX_OUTLET_DIST) {
             reorient(pangle, distance);

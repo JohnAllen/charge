@@ -7,14 +7,14 @@ project(charge)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  cv_bridge
+  sensor_msgs
+  image_transport
+  dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
-#find_package(OpenCV)
-#include_directories(${OpenCV_INCLUDE_DIRS})
-#target_link_libraries(outlet_node ${OpenCV_LIBRARIES})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -104,7 +104,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES charge
-#  CATKIN_DEPENDS lidarLite roscpp std_msgs
+CATKIN_DEPENDS cv_bridge roscpp sensor_msgs std_msgs 
 #  DEPENDS system_lib
 )
 
@@ -117,6 +117,7 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -130,26 +131,27 @@ include_directories(
 # add_dependencies(charge ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-#add_executable(outlet_node src/outlet_node.cpp)
-#add_executable(servo_node src/servo_node.cpp)
-
 add_executable(dist_node dist_node.cpp)
 add_library(lidarLite include/lidarLite/src/lidarLite.cpp)
 target_link_libraries(dist_node 
     lidarLite  
     /usr/local/lib/libwiringPi.so.2.31
     /usr/local/lib/libwiringPiPca9685.so
+   ${catkin_LIBRARIES}
 )
 
-target_link_libraries(dist_node 
+add_executable(outlet_node outlet_node.cpp)
+target_link_libraries(outlet_node
     ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
 )
-#target_link_libraries(outlet_node
-#    ${catkin_LIBRARIES}
-#)
-#target_link_libraries(servo_node
-#    ${catkin_LIBRARIES}
-#)
+
+add_executable(arm_node arm_node.cpp)
+target_link_libraries(arm_node
+    ${catkin_LIBRARIES}
+    /usr/local/lib/libwiringPi.so.2.31
+    /usr/local/lib/libwiringPiPca9685.so
+)
 
 add_executable(drive_node drive_node.cpp)
 target_link_libraries(drive_node
@@ -157,9 +159,6 @@ target_link_libraries(drive_node
     /usr/local/lib/libwiringPi.so.2.31
 )
 
-
-#find_package(OpenCV REQUIRED)
-#target_link_libaries(your_node ${OpenCV_LIBS})
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above

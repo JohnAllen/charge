@@ -67,16 +67,19 @@ void rightDegrees(int degrees)
 
 void search(int front_dist, int back_dist) 
 {
-    while (1==1)
+    int degrees;
+    while (1)
     {
         if (front_dist > MIN_FRT_DIST)
         {
-            leftDegrees(20);
+            degrees = 90;
+            leftDegrees(degrees);
             forward();
         }
         else if (back_dist > MIN_BCK_DIST)
         {
-            leftDegrees(20);
+            degrees = 20;
+            leftDegrees(degrees);
             reverse();
         }
         else if (front_dist < MIN_FRT_DIST && back_dist < MIN_BCK_DIST)
@@ -125,7 +128,7 @@ int driveForSeconds(int direction, int seconds)
     return 0;
 }
 
-void driveMotor(int motorNum, int direction)
+/*void driveMotor(int motorNum, int direction)
 {
 
   if (wiringPiSetup () == -1) {
@@ -176,4 +179,4 @@ void driveMotor(int motorNum, int direction)
         break;
 
     }
-}
+}*/
