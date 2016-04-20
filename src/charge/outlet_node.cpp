@@ -33,11 +33,11 @@ int detectOutlets(Mat frame)
     equalizeHist(frame_gray, frame_gray);
 
     //  Detect outlets
-    outlet_cascade.detectMultiScale(frame_gray, outlets, 1.1, 2, 0, Size(20, 20));
+    outlet_cascade.detectMultiScale(frame_gray, outlets, 1.1, 3, 0, Size(20, 20));
 
     //if (outlets.size() > 0)
     //{
-    cout << "outlets.size() is " << outlets.size() << "\n";
+    cout << outlets.size() << " outlets detected\n";
     return outlets.size();
     //}
 
@@ -50,14 +50,13 @@ int detectOutlets(Mat frame)
 }
 
 
-
 int main (int argc, char **argv)
 {
     ros::init(argc, argv, "outlet_node");
     ros::NodeHandle outlet_node;
     
     printf("inited outlet_node\n");
-    std_msgs::Int8 OUTLET_DETECTED_MSG;
+    std_msgs::Int8 OUTLET_MSG;
     ros::Publisher outlet_pub = outlet_node.advertise<std_msgs::Int8>("outlet", 100);
 
     VideoCapture capture;
@@ -78,29 +77,24 @@ int main (int argc, char **argv)
     
     ros::Rate r(1);
 
-    bool OUTLET_DETECTED = false;
     while (ros::ok() && capture.read(frame))
     {
         if (frame.empty())
         {
             printf("outlet frame empty PROBLEM\n");
-            // TODO ROS DEBUG
         }
         
         if (detectOutlets(frame))
         {
-            OUTLET_DETECTED = true;
-            cout << "outlet detected\n";
-
-            outlet_pub.publish(OUTLET_DETECTED_MSG);
-            ros::spinOnce();
+            OUTLET_MSG.data = 1;
         }
         else
         {
+            OUTLET_MSG.data = 0;
             printf("No outlets detected at this time\n");
-            OUTLET_DETECTED = false;
         }
-
+        outlet_pub.publish(OUTLET_MSG);
+        ros::spinOnce();
         r.sleep();              
     }
 

@@ -54,25 +54,16 @@ int main (int argc, char **argv)
     }   
     ros::init(argc, argv, "drive_node");
     ros::NodeHandle drive_node;
-    cout << "Made it here\n";
     ros::Subscriber dist_sub = drive_node.subscribe("dist", 100,
 distCallback); // Distance is automatically the distance to outlet
     ros::Subscriber outlet_sub = drive_node.subscribe("outlets", 100, outletCallback);
     ros::Subscriber panangle_sub = drive_node.subscribe("pan_angle", 100, panangleCallback);
-    cout << "Made it here\n";
    
     int front_dist = 100; 
     int back_dist = 100;
     while (ros::ok())
     {
-//        search(front_dist, back_dist);
-        /*if (!OUTLETS) {
-        } else if (OUTLETS && DIST > MAX_OUTLET_DIST) {
-            reorient(pangle, distance);
-        } else if (PLUGGED_IN) {
-            pause()
-        }*/
-
+        
         ros::spin();
     }
     return 0;
