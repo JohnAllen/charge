@@ -35,11 +35,7 @@ int detectOutlets(Mat frame)
     //  Detect outlets
     outlet_cascade.detectMultiScale(frame_gray, outlets, 1.1, 3, 0, Size(20, 20));
 
-    //if (outlets.size() > 0)
-    //{
-    cout << outlets.size() << " outlets detected\n";
-    return outlets.size();
-    //}
+    cout << outlets.size() << " outlets detected" << endl;
 
     for(size_t i = 0; i < outlets.size(); i++)
     {
@@ -47,6 +43,7 @@ int detectOutlets(Mat frame)
         //Point center([i].x + outlets[i].width/2, outlets[i].y +outlets[i].height/2);
         //ellipse(frame, center, Size(outlets[i].width/2, outlets[i].height/2 ), 0, 0, 360, Scalar( 255,0,0),2,8,0);
     }
+    return outlets.size();
 }
 
 
@@ -55,24 +52,27 @@ int main (int argc, char **argv)
     ros::init(argc, argv, "outlet_node");
     ros::NodeHandle outlet_node;
     
-    printf("inited outlet_node\n");
+    cout << "inited outlet_node" << endl;
     std_msgs::Int8 OUTLET_MSG;
     ros::Publisher outlet_pub = outlet_node.advertise<std_msgs::Int8>("outlet", 100);
+//    ros::Publisher outlet_ctr = outlet_node.advertise<std_msgs::Int8>("outlet_ctr", 100);
 
     VideoCapture capture;
     Mat frame;
 
     outlet_cascade_path = ros::package::getPath("charge") + "/" + outlet_cascade_path;
-    cout << "charge's package path is " << outlet_cascade_path << "\n";
+    cout << "charge's package path is " << outlet_cascade_path << endl;
     if (!outlet_cascade.load(outlet_cascade_path))
     {
-        printf("--(!) Couldn't load the outlet cascade file\n"); return -1; 
+        cout << "--(!) Couldn't load the outlet cascade file" << endl;
+         return -1; 
     }
 
     capture.open(-1) ;
     if (!capture.isOpened())
     {
-        printf("--(!)Error opening video capture\n"); return -1;
+        cout << "--(!)Error opening video capture" << endl; 
+        return -1;
     }
     
     ros::Rate r(1);
@@ -81,10 +81,9 @@ int main (int argc, char **argv)
     {
         if (frame.empty())
         {
-            printf("outlet frame empty PROBLEM\n");
+            cout << "ERROR outlet frame empty PROBLEM" << endl;
         }
-        
-        if (detectOutlets(frame))
+        else if (detectOutlets(frame))
         {
             OUTLET_MSG.data = 1;
         }
