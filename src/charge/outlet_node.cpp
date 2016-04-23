@@ -55,8 +55,8 @@ int main (int argc, char **argv)
     cout << "inited outlet_node" << endl;
     std_msgs::Int8 OUTLET_MSG;
     ros::Publisher outlet_pub = outlet_node.advertise<std_msgs::Int8>("outlet", 100);
-//    ros::Publisher outlet_ctr = outlet_node.advertise<std_msgs::Int8>("outlet_ctr", 100);
-
+    ros::Publisher outlet_ctr = outlet_node.advertise<std_msgs::Int8>("outlet_ctr", 100);
+    
     VideoCapture capture;
     Mat frame;
 
@@ -68,7 +68,7 @@ int main (int argc, char **argv)
          return -1; 
     }
 
-    capture.open(-1) ;
+    capture.open(-1);
     if (!capture.isOpened())
     {
         cout << "--(!)Error opening video capture" << endl; 
@@ -76,12 +76,11 @@ int main (int argc, char **argv)
     }
     
     ros::Rate r(1);
-
     while (ros::ok() && capture.read(frame))
     {
         if (frame.empty())
         {
-            cout << "ERROR outlet frame empty PROBLEM" << endl;
+            cout << "ERROR outlet frame empty" << endl;
         }
         else if (detectOutlets(frame))
         {

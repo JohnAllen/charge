@@ -16,6 +16,10 @@ const int IN7 = 6;  // gpio/bcm 25
 const int IN8 = 21; // gpio/bcm 5
 
 const int MAX_OUTLET_DIST = 60;
+
+const float TIRE_DIAM = 10.88;
+const int RPM = 20;  // Approximate based on motor specs of 25 rpm at 18v
+
 using namespace std;
 
 /*

@@ -19,7 +19,7 @@ int main (int argc, char **argv) {
     std_msgs::Int8 dist_msg;
     ros::Publisher dist_pub = dist_node.advertise<std_msgs::Int8>("dist", 1000);
 
-    ros::Rate r(3);
+    ros::Rate r(5);
 
     while (ros::ok()) {
         // get distance
