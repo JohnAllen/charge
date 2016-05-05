@@ -31,7 +31,6 @@ const float PAN_RANGE = MAX_0 - MIN_0;
 #define SERVO_2 302
 #define SERVO_3 303 
 
-
 using namespace std;
 
 std_msgs::Int8 OUTLET_DETECTED;
@@ -55,18 +54,44 @@ float range_increment(float min, float max, float millis)
     return (max - min) / millis;
 }
 
-int angleMicroSec(int tick)
+void servoAngle(int servo_num, int angle)
 {
-    return tick;
+    sleep(1);
+    float angleRange = 180;
+    float servoRange = MAX - MIN;
+    float anglePercent = angle / angleRange;
+    float servoAngle = MIN + (anglePercent * servoRange);
+    int tick = calcTicks(servoAngle, HERTZ);
+    pwmWrite(servo_num, tick);
+    sleep(1);
 }
 
-float panAngle()
+void scan(int ms)
 {
-   return 0; 
+    float increment = range_increment(MIN_0, MIN_1, ms);)
+    for (i = MIN_0; i <= MAX_0;  i+=increment)
+            {
+               cout << "SCANNING FORWARD: %d/n";
+                tick = calcTicks(i, HERTZ);
+                pwmWrite(SERVO_0, tick);
+                int angle = angleFromPWMPulse(tick);
+                PAN_ANGLE.data = angle;
+            }
+            
+            for (j = i; j >= MIN_0; j-= increment)
+            {
+                cout << "SCANNING: %d/n";
+                tick = calcTicks(j, HERTZ);
+                pwmWrite(SERVO_0, tick);
+                int angle = angleFromPWMPulse(tick);
+                PAN_ANGLE.data = angle;
+            }
 }
 
-int pause() {
-    return 0;   
+int angleFromPWMPulse(float pulse)
+{
+    // example pulse: 1.5 or 1500?
+    return angle;   
 }
 
 void outletDetectedCallback(std_msgs::Int8 outlet_msg) 
@@ -90,51 +115,31 @@ int main (int argc, char **argv)
     ros::NodeHandle arm_node;
     ros::Publisher arm_pub = arm_node.advertise<std_msgs::Int8>("pan_angle", 100);
     
-    ros::Subscriber out_det_sub=arm_node.subscribe("outlet", 100,
+    ros::Subscriber out_det_sub = arm_node.subscribe("outlet", 100,
  outletDetectedCallback); 
 
-    ros::Rate r(1);
+    ros::Rate r(4);
    
     int tick, i, j = 0;
  
-    // BOOT: set pan angle servo to 0, or reverse it to 0
-    /*float increment = range_increment(MIN_0, MAX_0, SCAN_TIME);
-    tick = calcTicks(MIN_0, HERTZ);
-        pwmWrite(SERVO_0, tick);  // set servo to minimum
-*/
-    
     while (ros::ok())
     {
         std_msgs::Int8 PAN_ANGLE; 
-        
+       
+        servoAngle(SERVO_0, 80);
         if (OUTLET_DETECTED.data > 0)
         {
             cout << "OUTLET DETECTED\n";
-    //        pause();
-            // Publish arm pan-angle so we can determine if we're close enough
-      //      arm_pub.publish(PAN_ANGLE);
+            pause();
         }
         else
         {
             cout << "NO OUTLET DETECTED\n";
-/*
-            for (i = MIN_0; i <= MAX_0;  i+=increment)
-            {
-                // cout << "Panning ackwards. Position: %d/n";
-                tick = calcTicks(i, HERTZ);
-                pwmWrite(SERVO_0, tick);
-                PAN_ANGLE.data = i;
-            }
-            
-            for (j = i; j >= MIN_0; j-= increment)
-            {
-                // cout << "Panning backwards. Position: %d/n";
-                tick = calcTicks(j, HERTZ);
-                pwmWrite(SERVO_0, tick);
-                PAN_ANGLE.data = j;
-            }*/
+            scan();
         }
         
+        servoAngle(SERVO_0, 100);
+        arm_pub.publish(PAN_ANGLE);
         ros::spinOnce();
         r.sleep();
     }

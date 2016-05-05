@@ -3,7 +3,6 @@
 #include "std_msgs/String.h"
 #include "std_msgs/Int8.h"
 #include "drive.h"
-#include <pca9685.h>
 #include <wiringPi.h>
 
 const int IN1 = 0;  // gpio/bcm 17
@@ -16,9 +15,8 @@ const int IN7 = 6;  // gpio/bcm 25
 const int IN8 = 21; // gpio/bcm 5
 
 const int MAX_OUTLET_DIST = 60;
-
-const float TIRE_DIAM = 10.88;
-const int RPM = 20;  // Approximate based on motor specs of 25 rpm at 18v
+const float TIRE_DIAM = 10.88; // cm
+const int RPM = 18;  // Approximate based on motor specs of 25 rpm at 18v
 
 using namespace std;
 
@@ -30,6 +28,13 @@ using namespace std;
 *   
 *   Need all vars available in main function scope:
 */
+
+std_msgs::Int8 PAN_ANGLE;
+
+void turnLongestPath()
+{
+}
+
 void distCallback(std_msgs::Int8 dist_msg)
 {
     ROS_INFO("I heard: [%d]", dist_msg.data);
@@ -43,6 +48,7 @@ void outletCallback(const std_msgs::Int8 outlet_msg)
 void panangleCallback(const std_msgs::Int8 pan_angle_msg)
 {
     ROS_INFO("I heard: [%s]", pan_angle_msg);
+    PAN_ANGLE = pan_angle_msg.data; 
 }
 
 int main (int argc, char **argv) 
@@ -63,12 +69,13 @@ distCallback); // Distance is automatically the distance to outlet
     ros::Subscriber outlet_sub = drive_node.subscribe("outlets", 100, outletCallback);
     ros::Subscriber panangle_sub = drive_node.subscribe("pan_angle", 100, panangleCallback);
    
-    int front_dist = 100; 
-    int back_dist = 100;
+    ros::Rate r(10);
+    
     while (ros::ok())
     {
-        
-        ros::spin();
+        forward();            
+        ros::spinOnce();
+        r.sleep();
     }
     return 0;
 
